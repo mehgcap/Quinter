@@ -12,7 +12,7 @@ class Mute:
 		self.type = type
 		self.value = value
 	
-	def shouldMuteTweet(tweet):
+	def shouldMuteTweet(self, tweet):
 		raise NotImplementedError
 
 class ClientMute(Mute):
@@ -20,6 +20,6 @@ class ClientMute(Mute):
 	def __init__(self, value):
 		super(ClientMute, self).__init__(self.TYPE_CLIENT, value)
 	
-	def shouldMuteTweet(tweet)-> bool:
+	def shouldMuteTweet(self, tweet)-> bool:
 		return hasattr(tweet, "source") and tweet.source == self.value
 
