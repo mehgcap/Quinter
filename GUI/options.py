@@ -67,6 +67,20 @@ class templates(wx.Panel, wx.Dialog):
 		self.main_box.Add(self.userTemplate, 0, wx.ALL, 10)
 		self.userTemplate.AppendText(globals.prefs.userTemplate)
 
+class MutesDialog(wx.Panel, wx.Dialog):
+	def __init__(self, parent, existingMutes):
+		super(MuteDialog, self).__init__(parent)
+		#make an array of the current mutes to add to the list control
+		muteStrings = []
+		for mute in existingMutes:
+			muteStrings.append(f"{mute.type}: {mute.value}"")
+		#make the interface
+		self.main_box = wx.BoxSizer(wx.VERTICAL)
+		self.mutesListLabel = wx.StaticText(self, -1, "Current Mutes")
+		self.main_box.Add(self.mutesListLabel, 0, wx.ALL, 10)
+		self.mutesList = wx.ListBox(self, -1, choices = muteStrings)
+		self.main_box.Add(self.mutesList, 0, wx.ALL, 10)
+
 class advanced(wx.Panel, wx.Dialog):
 	def __init__(self, parent):
 		super(advanced, self).__init__(parent)
