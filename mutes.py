@@ -14,6 +14,12 @@ class Mute:
 	
 	def shouldMuteTweet(self, tweet):
 		raise NotImplementedError
+	
+	def __str__(self):
+		return f"{self.type}: {self.value}"
+	
+	def __eq__(self, otherMute) -> bool:
+		return self.type == otherMute.type and self.value == otherMute.value
 
 class ClientMute(Mute):
 
@@ -23,3 +29,29 @@ class ClientMute(Mute):
 	def shouldMuteTweet(self, tweet)-> bool:
 		return hasattr(tweet, "source") and tweet.source == self.value
 
+class HashtagMute(Mute):
+
+	def __init__(self, value):
+		super(HashtagMute, self).__init__(self.TYPE_CLIENT, value)
+	
+	def shouldMuteTweet(self, tweet)-> bool:
+		return hasattr(tweet, "text") and self.value in tweet.text
+
+
+
+class UserMute(Mute):
+
+	def __init__(self, value):
+		super(UserMute, self).__init__(self.TYPE_CLIENT, value)
+	
+	def shouldMuteTweet(self, tweet)-> bool:
+		return hasattr(tweet, "sender") and self.value in tweet.sender
+
+def muteFactory(muteType, muteValue):
+	if muteType == Mute.TYPE_CLIENT:
+		return ClientMute(muteValue)
+	elif type == Mute.TYPE_HASHTAG:
+		return HashtagMute(muteValue)
+	elif muteType == Mute.TYPE_USER:
+		return UserMute(muteValue)
+	raise Exception(f"Mute type \"{muteType}\" is not supported.")

@@ -1,4 +1,7 @@
+from utils import alert
+from GUI.NewMuteDialog import NewMuteDialog
 import timeline
+import mutes
 import platform
 import os, sys
 import globals
@@ -68,18 +71,27 @@ class templates(wx.Panel, wx.Dialog):
 		self.userTemplate.AppendText(globals.prefs.userTemplate)
 
 class MutesDialog(wx.Panel, wx.Dialog):
-	def __init__(self, parent, existingMutes):
-		super(MuteDialog, self).__init__(parent)
+	def __init__(self, parent, existingMutes=[]):
+		super(MutesDialog, self).__init__(parent)
 		#make an array of the current mutes to add to the list control
 		muteStrings = []
 		for mute in existingMutes:
-			muteStrings.append(f"{mute.type}: {mute.value}"")
+			muteStrings.append(f"{mute.type}: {mute.value}")
 		#make the interface
 		self.main_box = wx.BoxSizer(wx.VERTICAL)
 		self.mutesListLabel = wx.StaticText(self, -1, "Current Mutes")
 		self.main_box.Add(self.mutesListLabel, 0, wx.ALL, 10)
-		self.mutesList = wx.ListBox(self, -1, choices = muteStrings)
+		self.mutesList = wx.ListBox(self, -1, choices=muteStrings)
 		self.main_box.Add(self.mutesList, 0, wx.ALL, 10)
+		self.newMuteButton = wx.Button(self, -1, label="New Mute")
+		self.newMuteButton.Bind(wx.EVT_BUTTON, self.newMute)
+	
+	def newMute(self, event):
+		newMuteDialog = NewMuteDialog(self, wx.ID_ANY)
+		returnValue = newMuteDialog.ShowModal()
+		if returnValue == NewMuteDialog.ID_SAVE:
+			newMute = mutes.muteFactory(newMuteDialog.muteTypesList.GetString(newMuteDialog.muteTypesList.GetSelection()), newMuteDialog.muteValueInput.GetValue())
+			newMuteDialog.Destroy()
 
 class advanced(wx.Panel, wx.Dialog):
 	def __init__(self, parent):
@@ -131,6 +143,12 @@ class OptionsGui(wx.Dialog):
 		self.general.SetFocus()
 		self.templates=templates(self.notebook)
 		self.notebook.AddPage(self.templates, "Templates")
+		existingMutes = [
+			mutes.ClientMute("foursquare"),
+			mutes.ClientMute("twitterrific")
+		]
+		self.mutes=MutesDialog(self.notebook, existingMutes)
+		self.notebook.AddPage(self.mutes, "Twitter Mutes")
 		self.advanced=advanced(self.notebook)
 		self.notebook.AddPage(self.advanced, "Advanced")
 		self.main_box.Add(self.notebook, 0, wx.ALL, 10)
