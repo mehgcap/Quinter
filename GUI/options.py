@@ -91,7 +91,6 @@ class MutesDialog(wx.Panel, wx.Dialog):
 		#if the user hit the save button, make a new mute from the details and save it
 		if returnValue == NewMuteDialog.ID_SAVE:
 			newMuteType = newMuteDialog.muteTypesList.GetString(newMuteDialog.muteTypesList.GetSelection())
-			alert("New mute type: " + newMuteType)
 			newMuteValue = newMuteDialog.muteValueInput.GetValue()
 			newMute = mutes.muteFactory(newMuteType, newMuteValue)
 			self.mutesList.append(newMute)
