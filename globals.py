@@ -6,10 +6,13 @@ import tweak
 import os
 import twitter as t
 import pickle
+import json
 import timeline
 import utils
 import threading
 import sound
+import mutes
+
 accounts=[]
 prefs=None
 users=[]
@@ -80,6 +83,8 @@ def  load():
 	prefs.window_shown=prefs.get("window_shown",True)
 	prefs.autoOpenSingleURL=prefs.get("autoOpenSingleURL", False)
 	prefs.use24HourTime=prefs.get("use24HourTime", False)
+	#mutes are stored as a JSON-encoded array of Mute (or a subclass of Mute) instances
+	finalMutes = []
 	prefs.mutes=prefs.get("mutes", [])
 	if platform.system()!="Darwin":
 		prefs.media_player=prefs.get("media_player","QPlay.exe")

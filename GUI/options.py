@@ -4,6 +4,7 @@ import timeline
 import mutes
 import platform
 import os, sys
+import json
 import globals
 import wx
 from . import main
@@ -73,24 +74,27 @@ class templates(wx.Panel, wx.Dialog):
 class MutesDialog(wx.Panel, wx.Dialog):
 	def __init__(self, parent, existingMutes=[]):
 		super(MutesDialog, self).__init__(parent)
-		#make an array of the current mutes to add to the list control
-		muteStrings = []
-		for mute in existingMutes:
-			muteStrings.append(f"{mute.type}: {mute.value}")
+		#this list holds all current mutes, and gets appended to when new mutes are created so prefs can grab this list when saving
+		self.mutesList = existingMutes
 		#make the interface
 		self.main_box = wx.BoxSizer(wx.VERTICAL)
 		self.mutesListLabel = wx.StaticText(self, -1, "Current Mutes")
 		self.main_box.Add(self.mutesListLabel, 0, wx.ALL, 10)
-		self.mutesList = wx.ListBox(self, -1, choices=muteStrings)
-		self.main_box.Add(self.mutesList, 0, wx.ALL, 10)
-		self.newMuteButton = wx.Button(self, -1, label="New Mute")
+		self.mutesListBox = wx.ListBox(self, -1, choices=[str(mute) for mute in self.mutesList])
+		self.main_box.Add(self.mutesListBox, 0, wx.ALL, 10)
+		self.newMuteButton = wx.Button(self, -1, label="&New Mute")
 		self.newMuteButton.Bind(wx.EVT_BUTTON, self.newMute)
 	
 	def newMute(self, event):
 		newMuteDialog = NewMuteDialog(self, wx.ID_ANY)
 		returnValue = newMuteDialog.ShowModal()
+		#if the user hit the save button, make a new mute from the details and save it
 		if returnValue == NewMuteDialog.ID_SAVE:
-			newMute = mutes.muteFactory(newMuteDialog.muteTypesList.GetString(newMuteDialog.muteTypesList.GetSelection()), newMuteDialog.muteValueInput.GetValue())
+			newMuteType = newMuteDialog.muteTypesList.GetString(newMuteDialog.muteTypesList.GetSelection())
+			alert("New mute type: " + newMuteType)
+			newMuteValue = newMuteDialog.muteValueInput.GetValue()
+			newMute = mutes.muteFactory(newMuteType, newMuteValue)
+			self.mutesList.append(newMute)
 			newMuteDialog.Destroy()
 
 class advanced(wx.Panel, wx.Dialog):
@@ -143,10 +147,7 @@ class OptionsGui(wx.Dialog):
 		self.general.SetFocus()
 		self.templates=templates(self.notebook)
 		self.notebook.AddPage(self.templates, "Templates")
-		existingMutes = [
-			mutes.ClientMute("foursquare"),
-			mutes.ClientMute("twitterrific")
-		]
+		existingMutes = [mutes.muteFactory(mute["type"], mute["value"]) for mute in globals.prefs.mutes]
 		self.mutes=MutesDialog(self.notebook, existingMutes)
 		self.notebook.AddPage(self.mutes, "Twitter Mutes")
 		self.advanced=advanced(self.notebook)
@@ -163,6 +164,8 @@ class OptionsGui(wx.Dialog):
 
 	def OnOK(self, event):
 		refresh=False
+		mutesToSave = [mute.toJSON() for mute in self.mutes.mutesList]
+		globals.prefs.mutes=mutesToSave
 		globals.prefs.use24HourTime = self.general.use24HourTime.GetValue()
 		globals.prefs.ask_dismiss=self.general.ask_dismiss.GetValue()
 		if platform.system()!="Darwin":
