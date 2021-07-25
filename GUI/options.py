@@ -1,4 +1,4 @@
-from utils import alert
+from utils import alert, question
 from GUI import mute_dialogs
 import timeline
 import mutes
@@ -88,6 +88,9 @@ class MutesDialog(wx.Panel, wx.Dialog):
 		self.editMuteButton = wx.Button(self, -1, label="&Edit")
 		self.editMuteButton.Bind(wx.EVT_BUTTON, self.editMute)
 		self.main_box.Add(self.editMuteButton, 0, wx.ALL, 10)
+		self.deleteMuteButton = wx.Button(self, -1, label="&Delete")
+		self.deleteMuteButton.Bind(wx.EVT_BUTTON, self.deleteMute)
+		self.main_box.Add(self.deleteMuteButton, 0, wx.ALL, 10)
 	
 	def newMute(self, event):
 		newMuteDialog = mute_dialogs.NewMuteDialog(self, wx.ID_ANY)
@@ -105,8 +108,6 @@ class MutesDialog(wx.Panel, wx.Dialog):
 		currentMuteIndex = self.mutesListBox.GetSelection()
 		currentMute = self.mutesList[currentMuteIndex]
 		editMuteDialog = mute_dialogs.EditMuteDialog(self, wx.ID_ANY, currentMute)
-		#editMuteDialog.muteTypesList.SetStringSelection(currentMute.type, True)
-		#editMuteDialog.muteValueInput.SetValue(currentMute.value)
 		returnValue = editMuteDialog.ShowModal()
 		#if the user hit the save button, update the currently selected mute with the new values
 		if returnValue == editMuteDialog.ID_SAVE:
@@ -115,6 +116,15 @@ class MutesDialog(wx.Panel, wx.Dialog):
 			self.mutesListBox.Set([str(mute) for mute in self.mutesList])
 			self.mutesListBox.SetSelection(currentMuteIndex)
 			editMuteDialog.Destroy()
+	
+	def deleteMute(self, event):
+		currentMuteIndex = self.mutesListBox.GetSelection()
+		currentMute = self.mutesList[currentMuteIndex]
+		shouldDelete = question("Delete Mute?", f"Are you sure you want to delete the {currentMute.type} mute for \"{currentMute.value}\"?", self)
+		if shouldDelete == 1:
+			del self.mutesList[currentMuteIndex]
+			self.mutesListBox.Set([str(mute) for mute in self.mutesList])
+			self.mutesListBox.SetSelection(0)
 
 class advanced(wx.Panel, wx.Dialog):
 	def __init__(self, parent):
