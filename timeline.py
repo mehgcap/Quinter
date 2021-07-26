@@ -109,6 +109,10 @@ class timeline(object):
 				sound.play(self.account,self.name)
 
 	def process_status(self,status):
+		#make sure this status shouldn't be skipped by any mutes
+		for mute in globals.prefs.mutes:
+			if mute.shouldMuteTweet(status):
+				return
 		self.statuses.append(status)
 		try:
 			if hasattr(status,"in_reply_to_status_id") and status.in_reply_to_status_id!=None:

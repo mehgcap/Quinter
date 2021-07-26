@@ -1,3 +1,5 @@
+import html
+
 class Mute:
 	"""
 	This is the parent class for tweet mutes. It is not intended to be used directly.
@@ -30,7 +32,12 @@ class ClientMute(Mute):
 		super(ClientMute, self).__init__(self.TYPE_CLIENT, value)
 	
 	def shouldMuteTweet(self, tweet)-> bool:
-		return hasattr(tweet, "source") and tweet.source == self.value
+		tweetToProcess = tweet
+		if hasattr(tweet, "retweeted_status"):
+			tweetToProcess = tweet.retweeted_status
+		if hasattr(tweet, "quoted_status"):
+			tweetToProcess = tweet.quoted_status
+		return tweetToProcess.source.lower() == self.value.lower()
 
 class HashtagMute(Mute):
 
@@ -38,7 +45,23 @@ class HashtagMute(Mute):
 		super(HashtagMute, self).__init__(self.TYPE_HASHTAG, value)
 	
 	def shouldMuteTweet(self, tweet)-> bool:
-		return hasattr(tweet, "text") and self.value in tweet.text
+		tweetToProcess = tweet
+		if hasattr(tweet, "retweeted_status"):
+			tweetToProcess = tweet.retweeted_status
+		if hasattr(tweet, "quoted_status"):
+			tweetToProcess = tweet.quoted_status
+		if hasattr(tweetToProcess, "extended_tweet") and "full_text" in tweetToProcess.extended_tweet:
+			text=html.unescape(tweetToProcess.extended_tweet["full_text"])
+		else:
+			if hasattr(tweetToProcess, "full_text"):
+				text=html.unescape(tweetToProcess.full_text)
+			else:
+				text=html.unescape(tweetToProcess.text)
+		#add a number sign to our value before using it, if we don't already have one
+		hashtag = self.value
+		if hashtag[0] != "#":
+			hashtag = "#" + hashtag
+		return hashtag in text
 
 
 class UserMute(Mute):
@@ -47,7 +70,12 @@ class UserMute(Mute):
 		super(UserMute, self).__init__(self.USER, value)
 	
 	def shouldMuteTweet(self, tweet)-> bool:
-		return hasattr(tweet, "sender") and self.value in tweet.sender
+		tweetToProcess = tweet
+		if hasattr(tweet, "retweeted_status"):
+			tweetToProcess = tweet.retweeted_status
+		if hasattr(tweet, "quoted_status"):
+			tweetToProcess = tweet.quoted_status
+		return tweetToProcess.user.screen_name.lower() == self.value.lower()
 
 #this function takes a type and a value, and uses the type to determine which kind of mute to create
 def muteFactory(muteType, muteValue):
