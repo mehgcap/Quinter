@@ -56,8 +56,8 @@ class NewMuteDialog(wx.Dialog):
 
 class EditMuteDialog(NewMuteDialog):
 
-	def __init__(self, parent, id, mute, title="Edit Mute"):
-		super(EditMuteDialog, self).__init__(parent, id=id, title=title)
+	def __init__(self, parent, id, mute: mutes.Mute, title: str="Edit Mute") -> None:
+		super().__init__(parent, id=id, title=title)
 		self.mute = mute
 		self.muteTypesList.SetStringSelection(self.mute.type, True)
 		self.muteValueInput.SetValue(self.mute.value)
