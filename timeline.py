@@ -1,6 +1,7 @@
 from tweepy import TweepError
 import time
 import globals
+import mutes
 import utils
 import speak
 import sound
@@ -110,9 +111,12 @@ class timeline(object):
 
 	def process_status(self,status):
 		#make sure this status shouldn't be skipped by any mutes
-		for mute in globals.prefs.mutes:
+		mutesList = [mutes.muteFactory(mute["type"], mute["value"]) for mute in globals.prefs.mutes]
+		for mute in mutesList:
+			#utils.alert(f"Testing tweet against {mute}")
 			if mute.shouldMuteTweet(status):
-				return
+				#return
+				utils.alert(f"Status is being muted by {mute}.")
 		self.statuses.append(status)
 		try:
 			if hasattr(status,"in_reply_to_status_id") and status.in_reply_to_status_id!=None:
