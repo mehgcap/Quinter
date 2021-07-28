@@ -2,6 +2,7 @@ from tweepy import TweepError
 import time
 import globals
 import mutes
+from logger import Logger
 import utils
 import speak
 import sound
@@ -10,6 +11,7 @@ import os
 from GUI import main
 class TimelineSettings(object):
 	def __init__(self,account,tl):
+		self.logger = Logger(self.__class__.__name__, prefs=globals.prefs)
 		self.account_id=account
 		self.tl=tl
 		self.mute=False
@@ -18,6 +20,7 @@ class TimelineSettings(object):
 
 class timeline(object):
 	def __init__(self,account,name,type,data=None,user=None,status=None,silent=False):
+		self.logger = Logger(self.__class__.__name__, prefs=globals.prefs)
 		self.members=[]
 		self.account=account
 		self.status=status
@@ -274,6 +277,7 @@ class timeline(object):
 		if self==self.account.timelines[len(self.account.timelines)-1] and self.account.ready==False:
 			self.account.ready=True
 			sound.play(self.account,"ready")
+		self.logger.info(f"Initialized {self.name} timeline, with {len(self.statuses)} statuses.")
 
 	def toggle_read(self):
 		if self.read==True:

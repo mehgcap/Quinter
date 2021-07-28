@@ -1,3 +1,4 @@
+from logger import Logger
 import sys
 import shutil
 import platform
@@ -21,12 +22,15 @@ confpath=""
 errors=[]
 currentAccount=None
 timeline_settings=[]
+logger = Logger(__name__)
 def  load():
+	global logger
 	global timeline_settings
 	threading.Thread(target=utils.cfu).start()
 	global confpath
 	global prefs
 	global users
+	logger.info("About to load")
 	prefs=tweak.Config(name="Quinter",autosave=True)
 	confpath=prefs.user_config_dir
 	if platform.system()=="Darwin":
@@ -52,6 +56,7 @@ def  load():
 		if os.path.exists(confpath+"/timelinecache"):
 			os.remove(confpath+"/timelinecache")
 		prefs.timelinecache_version=2
+	prefs.logLevel = prefs.get("logLevel", "debug")
 	prefs.user_reversed=prefs.get("user_reversed",False)
 	prefs.user_limit=prefs.get("user_limit",4)
 	prefs.tweetTemplate=prefs.get("tweetTemplate","$user.screen_name$: $text$ $created_at$")
