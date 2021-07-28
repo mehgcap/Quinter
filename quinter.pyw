@@ -4,7 +4,7 @@ import platform
 import sys
 
 def customExceptHook(exceptionType, exceptionValue, exceptionTraceback):
-	logger = Logger("global exceptHook", True, "info", "")
+	logger = Logger("global exceptHook", printMessages=True, level="info")
 	logger.critical(f"An unhandled error was raised.\n{exceptionType}: {exceptionValue}\nTraceback: {exceptionTraceback}")
 
 sys.excepthook = customExceptHook

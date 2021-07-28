@@ -1,28 +1,34 @@
 import application
-import globals
 
 import logging
 import os
 
 class Logger(logging.FileHandler):
 
-	def __init__(self, channelName: str, printMessages: bool=True, logLevel=None, filePath: str=None, *args, **kwargs) -> None:
+	def __init__(self,
+		channelName: str,
+		printMessages: bool=True, #if true, messages will be logged as well as printed to stdout
+		prefs=None, #should be an instance of the prefs object from globals; if None, sensible defaults are used for arguments not passed in
+		level=None, #one of the valid levels in Python's logging module
+		filePath: str=None, #the path of the log file, not including the file name
+		*args, **kwargs
+	) -> None:
 		self.channelName = channelName
-		self.level = logLevel
-		if self.level is None:
-			try:
-				self.level = globals.prefs.logLevel
-			except AttributeError: #prefs may not be initialized yet
-				self.level = "info"
 		self.filePath = filePath
 		if self.filePath is None:
 			try:
-				self.filePath = globals.prefs.user_config_dir
+				self.filePath = prefs.user_config_dir
 			except AttributeError:
 				self.filePath = "" #should put the log in the main directory
 		self.filename = f"{application.shortname}.log"
 		self.fullPath = os.path.join(self.filePath, self.filename)
 		super().__init__(self.fullPath, *args, **kwargs)
+		self.level = level
+		if self.level is None:
+			try:
+				self.level = prefs.logLevel
+			except AttributeError: #prefs may not be initialized yet
+				self.level = "info"
 		fileFormatter = logging.Formatter("%(name)s.%(levelname)s at %(asctime)s, line %(lineno)s:\n\t%(message)s", datefmt="%H:%M:%S, %b %d, %Y")
 		fileHandler = logging.FileHandler(self.fullPath)
 		fileHandler.setFormatter(fileFormatter)

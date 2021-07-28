@@ -19,7 +19,7 @@ confpath=""
 errors=[]
 currentAccount=None
 timeline_settings=[]
-logger = Logger("globals")
+logger = Logger(__name__)
 def  load():
 	global logger
 	global timeline_settings
