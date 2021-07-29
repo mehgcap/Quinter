@@ -2,6 +2,7 @@ import timeline
 import platform
 import os, sys
 import globals
+from utils import alert
 import wx
 from . import main
 
@@ -104,6 +105,10 @@ class advanced(wx.Panel, wx.Dialog):
 		self.main_box.Add(self.media_player, 0, wx.ALL, 10)
 		self.media_player.SetPath(globals.prefs.media_player)
 		self.main_box.Add(self.media_player_box, 0, wx.ALL, 10)
+		self.logLevelLabel = wx.StaticText(self, -1, "Log Level (restart to apply)")
+		self.main_box.Add(self.logLevelLabel, 0. wx.ALL, 10)
+		self.logLevelListbox = wx.ListBox(self, choices=["Debug", "Info", "Warning"], style=wx.LB_SINGLE)
+		self.main_box.Add(self.logLevelListbox, 0, wx.ALL, 10)
 
 class OptionsGui(wx.Dialog):
 	def __init__(self):
@@ -131,6 +136,8 @@ class OptionsGui(wx.Dialog):
 
 	def OnOK(self, event):
 		refresh=False
+		globals.prefs.logLevel = self.advanced.logLevelListbox.GetStringSelection()
+		alert(f"Log level set to {globals.prefs.logLevel}", "Log Level")
 		globals.prefs.use24HourTime = self.general.use24HourTime.GetValue()
 		globals.prefs.ask_dismiss=self.general.ask_dismiss.GetValue()
 		if platform.system()!="Darwin":
