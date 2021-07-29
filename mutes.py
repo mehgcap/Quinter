@@ -1,3 +1,6 @@
+import globals
+from logger import Logger
+
 import html
 
 class Mute:
@@ -11,6 +14,7 @@ class Mute:
 	TYPE_USER = "user"
 
 	def __init__(self, type, value):
+		self.logger = Logger(self.__class__, prefs=globals.prefs)
 		self.type = type
 		self.value = value
 	
@@ -37,7 +41,10 @@ class ClientMute(Mute):
 			tweetToProcess = tweet.retweeted_status
 		if hasattr(tweet, "quoted_status"):
 			tweetToProcess = tweet.quoted_status
-		return tweetToProcess.source.lower() == self.value.lower()
+		shouldMute = tweetToProcess.source.lower() == self.value.lower()
+		if shouldMute:
+			self.logger.debug(f"Muting tweet: tweet source {tweetToProcess.source.lower()} matches mute value {self.value}")
+		return shouldMute
 
 class HashtagMute(Mute):
 
@@ -60,8 +67,12 @@ class HashtagMute(Mute):
 		#add a number sign to our value before using it, if we don't already have one
 		hashtag = self.value
 		if hashtag[0] != "#":
+			self.logger.debug("Adding # to the start of our value")
 			hashtag = "#" + hashtag
-		return hashtag in text
+		shouldMute = hashtag in text
+		if shouldMute:
+			self.logger.debug(f"Muting tweet: {hashtag} is present in tweet text")
+		return shouldMute
 
 
 class UserMute(Mute):
@@ -75,7 +86,10 @@ class UserMute(Mute):
 			tweetToProcess = tweet.retweeted_status
 		if hasattr(tweet, "quoted_status"):
 			tweetToProcess = tweet.quoted_status
-		return tweetToProcess.user.screen_name.lower() == self.value.lower()
+		shouldMute = tweetToProcess.user.screen_name.lower() == self.value.lower()
+		if shouldMute:
+			self.logger.debug(f"Muting tweet: tweet sender {tweetToProcess.user.screen_name} matches mute value {self.value}")
+		return shouldMute
 
 #this function takes a type and a value, and uses the type to determine which kind of mute to create
 def muteFactory(muteType, muteValue):

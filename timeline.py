@@ -277,7 +277,6 @@ class timeline(object):
 		if self==self.account.timelines[len(self.account.timelines)-1] and self.account.ready==False:
 			self.account.ready=True
 			sound.play(self.account,"ready")
-		self.logger.info(f"Initialized {self.name} timeline, with {len(self.statuses)} statuses.")
 
 	def toggle_read(self):
 		if self.read==True:

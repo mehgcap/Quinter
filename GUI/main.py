@@ -4,6 +4,7 @@ import platform
 import pyperclip
 import sys
 import application
+from logger import Logger
 import wx
 from keyboard_handler.wx_handler import WXKeyboardHandler
 import globals
@@ -16,6 +17,7 @@ import threading
 
 class MainGui(wx.Frame):
 	def __init__(self, title):
+		self.logger = Logger(__name__, prefs=globals.prefs)
 		self.invisible=False
 		wx.Frame.__init__(self, None, title=title,size=(800,600))
 		self.Center()
@@ -322,6 +324,7 @@ class MainGui(wx.Frame):
 	def OnClose(self, event=None):
 		if platform.system()!="Darwin":
 			self.trayicon.on_exit(event,False)
+		self.logger.info(f"Exiting {application.shortname}")
 		self.Destroy()
 		sys.exit()
 
