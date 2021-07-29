@@ -7,7 +7,7 @@ def customExceptHook(exceptionType, exceptionValue, exceptionTraceback):
 	logger = Logger("global exceptHook", printMessages=True, level="info")
 	logger.critical(f"An unhandled error was raised.\n{exceptionType}: {exceptionValue}\nTraceback: {exceptionTraceback}")
 
-sys.excepthook = customExceptHook
+#sys.excepthook = customExceptHook
 sys.dont_write_bytecode=True
 import shutil
 import os
@@ -21,6 +21,8 @@ import speak
 from GUI import main
 import globals
 globals.load()
+logger = Logger(__name__, prefs=globals.prefs)
+logger.info("About to set up the GUI")
 if globals.prefs.window_shown==True:
 	main.window.Show()
 else:
