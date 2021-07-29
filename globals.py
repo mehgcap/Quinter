@@ -30,7 +30,7 @@ def  load():
 	global confpath
 	global prefs
 	global users
-	logger.info("About to load")
+	logger.info("About to load preferences")
 	prefs=tweak.Config(name="Quinter",autosave=True)
 	confpath=prefs.user_config_dir
 	if platform.system()=="Darwin":
