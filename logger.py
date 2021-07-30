@@ -23,12 +23,16 @@ class Logger(logging.Logger):
 				self.filePath = "" #should put the log in the main directory
 		self.filename = f"{application.shortname}.log"
 		self.fullPath = os.path.join(self.filePath, self.filename)
+		#print(f"Setting up {self.channelName} logger. File path: {self.fullPath}")
 		self.level = level
 		if self.level is None:
+			#print("Level was None. Looking in prefs.")
 			try:
 				self.level = prefs.logLevel
+				#print(f"Found a level in prefs: {self.level}")
 			except AttributeError: #prefs may not be initialized yet
 				self.level = "info"
+				#print(f"No level passed in or in prefs. Setting level to {self.level}.")
 		self.levelInt = logging._checkLevel(self.level.upper())
 		super().__init__(self.channelName, self.levelInt, *args, **kwargs)
 

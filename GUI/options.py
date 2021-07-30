@@ -1,11 +1,12 @@
 from utils import alert, question
 from GUI import mute_dialogs
+from logger import Logger
 import timeline
 import mutes
 import platform
 import os, sys
-import json
 import globals
+from utils import alert
 import wx
 from . import main
 
@@ -163,9 +164,16 @@ class advanced(wx.Panel, wx.Dialog):
 		self.main_box.Add(self.media_player, 0, wx.ALL, 10)
 		self.media_player.SetPath(globals.prefs.media_player)
 		self.main_box.Add(self.media_player_box, 0, wx.ALL, 10)
+		self.logLevelLabel = wx.StaticText(self, -1, "Log Level (restart to apply)")
+		self.main_box.Add(self.logLevelLabel, 0, wx.ALL, 10)
+		self.logLevelListbox = wx.ListBox(self, choices=["Debug", "Info", "Warning"], style=wx.LB_SINGLE)
+		self.logLevelListbox.SetStringSelection(globals.prefs.logLevel)
+		self.main_box.Add(self.logLevelListbox, 0, wx.ALL, 10)
 
 class OptionsGui(wx.Dialog):
 	def __init__(self):
+		self.logger = Logger(f"{__name__}:{self.__class__.__name__}", prefs=globals.prefs)
+		self.logger.debug("Setting up the global options window.")
 		wx.Dialog.__init__(self, None, title="Options", size=(350,200)) # initialize the wx frame
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.panel = wx.Panel(self)
@@ -192,9 +200,14 @@ class OptionsGui(wx.Dialog):
 		self.panel.Layout()
 
 	def OnOK(self, event):
+		self.logger.debug("Saving global options.")
 		refresh=False
+<<<<<<< HEAD
 		mutesToSave = [mute.toJSON() for mute in self.mutes.mutesList]
 		globals.prefs.mutes=mutesToSave
+=======
+		globals.prefs.logLevel = self.advanced.logLevelListbox.GetStringSelection()
+>>>>>>> logging
 		globals.prefs.use24HourTime = self.general.use24HourTime.GetValue()
 		globals.prefs.ask_dismiss=self.general.ask_dismiss.GetValue()
 		if platform.system()!="Darwin":
