@@ -10,7 +10,7 @@ import os
 from GUI import main
 class TimelineSettings(object):
 	def __init__(self,account,tl):
-		self.logger = Logger(self.__class__.__name__, prefs=globals.prefs)
+		self.logger = Logger(f"{__name__}:{self.__class__.__name__}", prefs=globals.prefs)
 		self.account_id=account
 		self.tl=tl
 		self.mute=False
@@ -19,7 +19,7 @@ class TimelineSettings(object):
 
 class timeline(object):
 	def __init__(self,account,name,type,data=None,user=None,status=None,silent=False):
-		self.logger = Logger(self.__class__.__name__, prefs=globals.prefs)
+		self.logger = Logger(f"{__name__}:{self.__class__.__name__}", prefs=globals.prefs)
 		self.members=[]
 		self.account=account
 		self.status=status
