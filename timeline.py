@@ -113,13 +113,6 @@ class timeline(object):
 				sound.play(self.account,self.name)
 
 	def process_status(self,status):
-		#make sure this status shouldn't be skipped by any mutes
-		mutesList = [mutes.muteFactory(mute["type"], mute["value"]) for mute in globals.prefs.mutes]
-		for mute in mutesList:
-			#utils.alert(f"Testing tweet against {mute}")
-			if mute.shouldMuteTweet(status):
-				#return
-				utils.alert(f"Status is being muted by {mute}.")
 		self.statuses.append(status)
 		try:
 			if hasattr(status,"in_reply_to_status_id") and status.in_reply_to_status_id!=None:
@@ -151,6 +144,15 @@ class timeline(object):
 	def load(self,back=False,speech=False,items=[]):
 		if self.hide==True:
 			return False
+		#remove any statuses that should be skipped by any mutes
+		mutesList = [mutes.muteFactory(mute["type"], mute["value"]) for mute in globals.prefs.mutes]
+		self.logger.debug(f"Found {len(mutesList)} mutes to test this tweet against.")
+		for mute in mutesList:
+			for status in items:
+				self.logger.debug(f"Checking status against mute: {mute}")
+				if mute.shouldMuteTweet(status):
+					#return False
+					self.logger.debug(f"Status is being muted by {mute}.")
 		if items==[]:
 			if back==True:
 				if globals.prefs.reversed==False:

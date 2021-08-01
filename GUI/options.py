@@ -202,12 +202,9 @@ class OptionsGui(wx.Dialog):
 	def OnOK(self, event):
 		self.logger.debug("Saving global options.")
 		refresh=False
-<<<<<<< HEAD
 		mutesToSave = [mute.toJSON() for mute in self.mutes.mutesList]
 		globals.prefs.mutes=mutesToSave
-=======
 		globals.prefs.logLevel = self.advanced.logLevelListbox.GetStringSelection()
->>>>>>> logging
 		globals.prefs.use24HourTime = self.general.use24HourTime.GetValue()
 		globals.prefs.ask_dismiss=self.general.ask_dismiss.GetValue()
 		if platform.system()!="Darwin":

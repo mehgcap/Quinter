@@ -89,7 +89,6 @@ def  load():
 	prefs.autoOpenSingleURL=prefs.get("autoOpenSingleURL", False)
 	prefs.use24HourTime=prefs.get("use24HourTime", False)
 	#mutes are stored as a JSON-encoded array of Mute (or a subclass of Mute) instances
-	finalMutes = []
 	prefs.mutes=prefs.get("mutes", [])
 	if platform.system()!="Darwin":
 		prefs.media_player=prefs.get("media_player","QPlay.exe")
